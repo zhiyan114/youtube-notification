@@ -11,6 +11,13 @@ import crypto from 'crypto';
 import xmlbodyparser from './xmlParser';
 import {Express, Request, Response} from 'express';
 
+declare module 'http' {
+  interface IncomingMessage {
+      rawBody: any;
+      _body: any;
+  }
+}
+
 
 // Type Definition
 export type NotifierOptions = {
@@ -283,7 +290,7 @@ export default class YouTubeNotifier extends EventEmitter {
    * @param {IncomingMessage} req
    * @param {ServerResponse} res
    */
-  _onPostRequest(req: any, res: Response) {
+  _onPostRequest(req: Request, res: Response) {
     let signatureParts, algo, signature, hmac;
 
     // Invalid POST
@@ -307,7 +314,7 @@ export default class YouTubeNotifier extends EventEmitter {
 
     // Match Secret
     if (this.options.secret) {
-      signatureParts = req.headers['x-hub-signature'].split('=');
+      signatureParts = (req.headers['x-hub-signature']! as string).split('=');
       algo = (signatureParts.shift() || '').toLowerCase();
       signature = (signatureParts.pop() || '').toLowerCase();
 

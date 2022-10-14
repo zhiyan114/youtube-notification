@@ -20,7 +20,7 @@ const regexp = /^(text\/xml|application\/([\w!#$%&*`\-.^~]+\+)?xml)$/i;
  * @param {YouTubeNotifier} notifier
  * @return {*}
  */
-function xmlbodyparser(req: any, res: Response, notifier: YouTubeNotifier) {
+function xmlbodyparser(req: Request, res: Response, notifier: YouTubeNotifier) {
   var data = '';
 
   var parser = new xml2js.Parser({
@@ -84,7 +84,7 @@ function xmlbodyparser(req: any, res: Response, notifier: YouTubeNotifier) {
  * @param {IncomingMessage} req
  * @return boolean
  */
-function hasBody(req: any) {
+function hasBody(req: Request) {
   var encoding = 'transfer-encoding' in req.headers;
   var length = 'content-length' in req.headers && req.headers['content-length'] !== '0';
   return encoding || length;
@@ -97,7 +97,7 @@ function hasBody(req: any) {
  * @param {IncomingMessage} req
  * @return string
  */
-function mime(req: any) {
+function mime(req: Request) {
   var str = req.headers['content-type'] || '';
   return str.split(';')[0];
 }
