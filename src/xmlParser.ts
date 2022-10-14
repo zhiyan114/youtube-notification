@@ -2,7 +2,9 @@
 /**
  * Module dependencies.
  */
-const xml2js = require('xml2js');
+import xml2js from 'xml2js';
+import { Request, Response } from 'express';
+import YouTubeNotifier from './index';
 
 /**
  * Constants
@@ -18,7 +20,7 @@ const regexp = /^(text\/xml|application\/([\w!#$%&*`\-.^~]+\+)?xml)$/i;
  * @param {YouTubeNotifier} notifier
  * @return {*}
  */
-function xmlbodyparser(req, res, notifier) {
+function xmlbodyparser(req: any, res: Response, notifier: YouTubeNotifier) {
   var data = '';
 
   var parser = new xml2js.Parser({
@@ -33,7 +35,7 @@ function xmlbodyparser(req, res, notifier) {
    * @param {Error} err
    * @param {Object} xml
    */
-  function responseHandler(err, xml) {
+  function responseHandler(err: any, xml: Object) {
     if (err) {
       err.status = 400;
       return notifier._onRequest(req, res);
@@ -54,16 +56,16 @@ function xmlbodyparser(req, res, notifier) {
 
   // Explicitly cast incoming to string
   req.setEncoding('utf-8');
-  req.on('data', chunk => {
+  req.on('data', (chunk: string) => {
     data += chunk;
   });
-
+  // ! saxParser is not DEFINED, fix later once the issue is found !
   // In case `parseString` callback never was called, ensure response is sent
-  parser.saxParser.onend = () => {
-    if (req.complete && req.rawBody === undefined) {
-      return responseHandler(null);
-    }
-  };
+  //parser.saxParser.onend = () => {
+  //  if (req.complete && req.rawBody === undefined) {
+  //    return responseHandler(null);
+  //  }
+  //};
 
   req.on('end', () => {
     // Invalid xml, length required
@@ -82,7 +84,7 @@ function xmlbodyparser(req, res, notifier) {
  * @param {IncomingMessage} req
  * @return boolean
  */
-function hasBody(req) {
+function hasBody(req: any) {
   var encoding = 'transfer-encoding' in req.headers;
   var length = 'content-length' in req.headers && req.headers['content-length'] !== '0';
   return encoding || length;
@@ -95,7 +97,7 @@ function hasBody(req) {
  * @param {IncomingMessage} req
  * @return string
  */
-function mime(req) {
+function mime(req: any) {
   var str = req.headers['content-type'] || '';
   return str.split(';')[0];
 }
